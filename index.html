@@ -1,143 +1,402 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToDoリスト（完了ボタン付き）</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 {
-            color: #007bff;
-        }
-        input {
-            padding: 10px;
-            font-size: 16px;
-            width: 60%;
-            max-width: 300px;
-            border: 2px solid #007bff;
-            border-radius: 5px;
-        }
-        button {
-            padding: 10px 15px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            opacity: 0.8;
-        }
-        .btn-add {
-            background-color: #007bff;
-            color: white;
-        }
-        .btn-complete {
-            background-color: #28a745;
-            color: white;
-        }
-        .btn-delete {
-            background-color: #dc3545;
-            color: white;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-            max-width: 400px;
-            margin: 20px auto;
-        }
-        li {
-            background: white;
-            margin: 5px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-radius: 5px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            flex-wrap: wrap;
-        }
-        .completed {
-            text-decoration: line-through;
-            color: gray;
-        }
-        .btn-group {
-            display: flex;
-            gap: 5px;
-        }
-    
-        /* スマホ対応（幅が500px以下の場合） */
-        @media (max-width: 500px) {
-            input {
-                width: 80%;
-                font-size: 14px;
-            }
-            button {
-                font-size: 14px;
-                padding: 8px;
-            }
-            .btn-group {
-                flex-direction: column;
-                gap: 3px;
-            }
-        }
-    </style>    
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToDoリスト</title>
+  <style>
+    /* 📌 全体のスタイル */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* 📌 ダークモード */
+    .dark-mode {
+      background-color: #121212;
+      color: white;
+    }
+
+    .dark-mode h1 {
+      color: #00bfff;
+    }
+
+    .dark-mode input, 
+    .dark-mode select, 
+    .dark-mode button {
+      background-color: #333;
+      color: white;
+      border: 1px solid white;
+    }
+
+    .dark-mode li {
+      background-color: #333;
+      color: white;
+    }
+
+    /* 📌 タイトル */
+    h1 {
+      color: #007bff;
+      font-size: 2.2em;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* 📌 コントロールエリア（カテゴリ・検索・ダークモード） */
+    .control-panel {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 15px;
+    }
+
+    .control-panel select,
+    .control-panel input[type="text"],
+    .control-panel button {
+      padding: 6px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    /* 📌 ダークモードボタン */
+    .btn-darkmode {
+      background-color: #333;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* 📌 入力エリア */
+    .input-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    /* 📌 ToDo入力欄 */
+    #taskInput {
+      flex: 2;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    /* 📌 日付入力欄 */
+    #taskDeadline {
+      flex: 1;
+      padding: 6px;
+      font-size: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    /* 📌 追加ボタン */
+    .btn-add {
+      flex: 0.5;
+      padding: 6px 10px;
+      font-size: 14px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* 📌 ToDoリスト */
+    ul {
+      list-style: none;
+      padding: 0;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    /* 📌 ToDoアイテム */
+    li {
+      background: white;
+      margin: 8px 0;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      border-radius: 5px;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+     /* 📌 カテゴリタグのスタイル */
+     .todo-category {
+      font-size: 12px;
+      font-weight: bold;
+      color:  white;
+      background-color: #007bff; /* 青 */
+      padding: 3px 6px;
+      border-radius: 3px;
+      margin-bottom: 5px;
+    }
+
+    .category-プライベート {
+      background-color: #28a745; /* 緑 */
+    }
+
+    .category-その他 {
+      background-color: #6c757d; /* 灰色 */
+    }
+
+
+    /* 📌 タスク内容 */
+    .todo-content {
+      font-size: 16px;
+    }
+
+    /* 📌 期限 */
+    .todo-deadline {
+      font-size: 12px;
+      color: #777;
+      margin-top: 5px;
+    }
+
+    /* 📌 ボタンの間隔 */
+    .btn-group {
+      display: flex;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    /* 📌 各ボタンのデザイン */
+    .btn-edit, .btn-complete, .btn-delete {
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-edit {
+      background-color: white;
+      color: black;
+      border: 1px solid #ccc;
+    }
+
+    .btn-complete {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .btn-delete {
+      background-color: #dc3545;
+      color: white;
+    }
+  </style>
 </head>
-<body>
-    <h1>ToDoリスト</h1>
+<body onload="loadTasks(); loadDarkMode();">
+  <h1>ToDoリスト</h1>
+
+  <div class="control-panel">
+    <select id="taskCategory">
+      <option value="仕事">仕事</option>
+      <option value="プライベート">プライベート</option>
+      <option value="その他">その他</option>
+    </select>
+    <input type="text" id="searchInput" placeholder="🔍 検索..." onkeyup="filterTasks()">
+    <button class="btn-darkmode" onclick="toggleDarkMode()">🌙</button>
+  </div>
+
+  <div class="input-area">
     <input type="text" id="taskInput" placeholder="やることを入力">
-    <button onclick="addTask()">追加</button>
-    <ul id="taskList"></ul>
+    <input type="datetime-local" id="taskDeadline">
+    <button class="btn-add" onclick="addTask()">追加</button>
+  </div>
 
-    <script>
-        // ページ読み込み時に保存されたToDoを表示
-        window.onload = function() {
-            const savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
-            savedTasks.forEach(task => addTask(task.text, false, task.completed));
-        };
+  <ul id="taskList"></ul>
 
-        function addTask(taskText = null, save = true, completed = false) {
-            const taskInput = document.getElementById("taskInput");
-            const text = taskText || taskInput.value.trim();
-            if (text === "") return;
+  <script>
+    let tasks = [];
 
-            const li = document.createElement("li");
-            li.innerHTML = `
-                <span class="${completed ? 'completed' : ''}">${text}</span>
-                <div class="btn-group">
-                    <button onclick="toggleComplete(this)">完了</button>
-                    <button onclick="removeTask(this)">削除</button>
-                </div>
-            `;
-            document.getElementById("taskList").appendChild(li);
+    // ローカルストレージへタスク一覧を保存
+    function saveTasks() {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
 
-            if (save) saveTasks();
-            taskInput.value = "";
+    // ローカルストレージからタスク一覧を読み込み、画面に表示
+    function loadTasks() {
+      const storedTasks = localStorage.getItem("tasks");
+      if (storedTasks) {
+        tasks = JSON.parse(storedTasks);
+      }
+      renderTasks();
+    }
+
+    // タスクを画面に描画
+    function renderTasks() {
+      const taskList = document.getElementById("taskList");
+      taskList.innerHTML = "";
+      tasks.forEach(task => {
+        const li = document.createElement("li");
+
+        // カテゴリタグ
+        const categorySpan = document.createElement("span");
+        categorySpan.className = "todo-category";
+        categorySpan.textContent = task.category;
+        li.appendChild(categorySpan);
+
+        // タスク内容
+        const contentSpan = document.createElement("span");
+        contentSpan.className = "todo-content";
+        contentSpan.textContent = task.content;
+        if (task.completed) {
+          contentSpan.style.textDecoration = "line-through";
+        }
+        li.appendChild(contentSpan);
+
+        // 期限の表示（期限が設定されている場合）
+        if (task.deadline) {
+          const deadlineSpan = document.createElement("span");
+          deadlineSpan.className = "todo-deadline";
+          // 日付形式をローカライズして表示
+          deadlineSpan.textContent = "期限: " + new Date(task.deadline).toLocaleString();
+          li.appendChild(deadlineSpan);
         }
 
-        function toggleComplete(button) {
-            const taskText = button.parentElement.previousElementSibling;
-            taskText.classList.toggle("completed");
-            saveTasks();
-        }
+        // ボタン群の作成
+        const btnGroup = document.createElement("div");
+        btnGroup.className = "btn-group";
 
-        function removeTask(button) {
-            button.parentElement.parentElement.remove();
-            saveTasks();
-        }
+        // 編集ボタン
+        const editBtn = document.createElement("button");
+        editBtn.className = "btn-edit";
+        editBtn.textContent = "編集";
+        editBtn.onclick = () => editTask(task.id);
+        btnGroup.appendChild(editBtn);
 
-        function saveTasks() {
-            const tasks = Array.from(document.querySelectorAll("#taskList li")).map(li => ({
-                text: li.querySelector("span").textContent,
-                completed: li.querySelector("span").classList.contains("completed")
-            }));
-            localStorage.setItem("tasks", JSON.stringify(tasks));
+        // 完了ボタン
+        const completeBtn = document.createElement("button");
+        completeBtn.className = "btn-complete";
+        completeBtn.textContent = "完了";
+        completeBtn.onclick = () => completeTask(task.id);
+        btnGroup.appendChild(completeBtn);
+
+        // 削除ボタン
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn-delete";
+        deleteBtn.textContent = "削除";
+        deleteBtn.onclick = () => deleteTask(task.id);
+        btnGroup.appendChild(deleteBtn);
+
+        li.appendChild(btnGroup);
+        taskList.appendChild(li);
+      });
+      // 検索結果のフィルタリングも適用
+      filterTasks();
+    }
+
+    // タスクの追加
+    function addTask() {
+      const taskInput = document.getElementById("taskInput");
+      const taskDeadline = document.getElementById("taskDeadline");
+      const taskCategory = document.getElementById("taskCategory");
+      const content = taskInput.value.trim();
+      const deadline = taskDeadline.value;
+      const category = taskCategory.value;
+
+      if (!content) {
+        alert("タスク内容を入力してください。");
+        return;
+      }
+
+      const newTask = {
+        id: Date.now(),  // ユニークなIDとしてタイムスタンプを使用
+        content,
+        deadline: deadline ? deadline : null,
+        category,
+        completed: false
+      };
+
+      tasks.push(newTask);
+      saveTasks();
+      renderTasks();
+      // 入力欄のリセット
+      taskInput.value = "";
+      taskDeadline.value = "";
+    }
+
+    // タスクの編集（内容と期限）
+    function editTask(id) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+
+      const newContent = prompt("編集内容を入力してください。", task.content);
+      if (newContent === null) return; // キャンセル時は何もしない
+      task.content = newContent.trim();
+
+      // 期限の編集
+      const newDeadline = prompt("新しい期限を入力してください。（YYYY-MM-DDTHH:MM形式、空欄で解除）", task.deadline ? task.deadline : "");
+      if (newDeadline !== null) {
+        task.deadline = newDeadline.trim() ? newDeadline : null;
+      }
+
+      saveTasks();
+      renderTasks();
+    }
+
+    // タスクの完了状態を切替
+    function completeTask(id) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      task.completed = !task.completed;
+      saveTasks();
+      renderTasks();
+    }
+
+    // タスクの削除
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      saveTasks();
+      renderTasks();
+    }
+
+    // 検索＆フィルター機能
+    function filterTasks() {
+      const query = document.getElementById("searchInput").value.trim().toLowerCase();
+      const listItems = document.querySelectorAll("#taskList li");
+      listItems.forEach(li => {
+        if (li.textContent.toLowerCase().includes(query)) {
+          li.style.display = "";
+        } else {
+          li.style.display = "none";
         }
-    </script>
+      });
+    }
+
+    // ダークモードの切替と状態の保存
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+      const isDark = document.body.classList.contains("dark-mode");
+      localStorage.setItem("darkMode", isDark ? "on" : "off");
+    }
+
+    // ページ読み込み時にダークモード状態を復元
+    function loadDarkMode() {
+      const darkMode = localStorage.getItem("darkMode");
+      if (darkMode === "on") {
+        document.body.classList.add("dark-mode");
+      }
+    }
+  </script>
 </body>
 </html>
+
