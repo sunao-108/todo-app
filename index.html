@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDoリスト（完了ボタン付き）</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #007bff;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 60%;
+            max-width: 300px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        .btn-add {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-complete {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+        li {
+            background: white;
+            margin: 5px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 5px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+        .btn-group {
+            display: flex;
+            gap: 5px;
+        }
+    
+        /* スマホ対応（幅が500px以下の場合） */
+        @media (max-width: 500px) {
+            input {
+                width: 80%;
+                font-size: 14px;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px;
+            }
+            .btn-group {
+                flex-direction: column;
+                gap: 3px;
+            }
+        }
+    </style>    
+</head>
+<body>
+    <h1>ToDoリスト</h1>
+    <input type="text" id="taskInput" placeholder="やることを入力">
+    <button onclick="addTask()">追加</button>
+    <ul id="taskList"></ul>
+
+    <script>
+        // ページ読み込み時に保存されたToDoを表示
+        window.onload = function() {
+            const savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            savedTasks.forEach(task => addTask(task.text, false, task.completed));
+        };
+
+        function addTask(taskText = null, save = true, completed = false) {
+            const taskInput = document.getElementById("taskInput");
+            const text = taskText || taskInput.value.trim();
+            if (text === "") return;
+
+            const li = document.createElement("li");
+            li.innerHTML = `
+                <span class="${completed ? 'completed' : ''}">${text}</span>
+                <div class="btn-group">
+                    <button onclick="toggleComplete(this)">完了</button>
+                    <button onclick="removeTask(this)">削除</button>
+                </div>
+            `;
+            document.getElementById("taskList").appendChild(li);
+
+            if (save) saveTasks();
+            taskInput.value = "";
+        }
+
+        function toggleComplete(button) {
+            const taskText = button.parentElement.previousElementSibling;
+            taskText.classList.toggle("completed");
+            saveTasks();
+        }
+
+        function removeTask(button) {
+            button.parentElement.parentElement.remove();
+            saveTasks();
+        }
+
+        function saveTasks() {
+            const tasks = Array.from(document.querySelectorAll("#taskList li")).map(li => ({
+                text: li.querySelector("span").textContent,
+                completed: li.querySelector("span").classList.contains("completed")
+            }));
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+    </script>
+</body>
+</html>
